@@ -16,6 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 	execName := args[0]
+	args = args[1:]
 	if execName == "version" {
 		fmt.Printf("%v\n", VERSION)
 		os.Exit(0)
