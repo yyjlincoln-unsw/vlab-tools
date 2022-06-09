@@ -18,7 +18,7 @@ func Which(execName string) {
 	}
 
 	// With local cache
-	if err := DownloadCommandFromCloud(execName); err != nil {
+	if err := DownloadCommandFromCloud(execName); err == nil {
 		fmt.Printf("Downloaded cloud command: \n")
 		if filePath, found := SearchForExecutable(execName, true); found {
 			fmt.Printf("%v\n", filePath)
