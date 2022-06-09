@@ -9,6 +9,7 @@ import (
 const VERSION = "v1.0"
 
 var EXECUTABLE_PATHS []string = []string{
+	"/home/z5423219/local-public/internals",
 	"/home/z5423219/local-public/bin",
 	"/home/z5423219/local-public",
 }
@@ -23,7 +24,7 @@ func main() {
 	}
 	execName := args[0]
 	if execName == "version" {
-		fmt.Printf("%v", VERSION)
+		fmt.Printf("%v\n", VERSION)
 		os.Exit(0)
 	}
 	if execName == "help" {
@@ -40,7 +41,7 @@ func main() {
 		executable := fmt.Sprintf("%v%c%v", path, os.PathSeparator, execName)
 		if _, err := os.Stat(executable); err == nil {
 			// Execute the command.
-			cmd := exec.Command(executable, args[1:]...)
+			cmd := exec.Command(executable, args...)
 			cmd.Stdout = os.Stdout
 			cmd.Stderr = os.Stderr
 			cmd.Stdin = os.Stdin
