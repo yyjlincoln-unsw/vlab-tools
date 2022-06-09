@@ -1,3 +1,1 @@
-LT Shadow
-Discovers executable from discoverable paths, except for local-public/bin which this program is located (to avoid executing itself).
-The name of the executable in discoverable paths is the same as the name of this shadow executable.
+Lincoln's Tools Service
