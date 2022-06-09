@@ -7,7 +7,6 @@ import (
 
 var FILE_PATHS []string = []string{
 	"/home/z5423219/local-public/internals",
-	"/home/z5423219/local-public/bin",
 	"/home/z5423219/local-public",
 }
 
