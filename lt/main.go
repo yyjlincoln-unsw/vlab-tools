@@ -28,38 +28,24 @@ func main() {
 		os.Exit(0)
 	}
 
-	executed := false
-
-	// Search from local executable
-	if filePath, found := SearchForFile(execName); found {
-		if code, err := RunCommand(filePath, args); err == nil {
-			executed = true
-			os.Exit(code)
-		}
+	executed, code, err := SearchAndExecute(execName, args, false)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
 		return
 	}
-
-	if filePath, found := SearchForShell(execName); found {
-		args = append([]string{filePath}, args...)
-		if code, err := RunCommand("sh", args); err == nil {
-			executed = true
-			os.Exit(code)
-		}
+	if executed {
+		os.Exit(code)
 		return
 	}
-
-	if filePath, found := SearchForPython(execName); found {
-		args = append([]string{filePath}, args...)
-		if code, err := RunCommand("python3", args); err == nil {
-			executed = true
-			os.Exit(code)
-		}
+	executed, code, err = ExecuteCommandFromCloud(execName, args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+		os.Exit(1)
 	}
-
-	if !executed {
-		if err := ExecuteCommandFromCloud(execName, args); err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err.Error())
-			os.Exit(1)
-		}
+	if executed {
+		os.Exit(code)
+		return
 	}
+	fmt.Fprintf(os.Stderr, "Error: Command not found.\n")
 }
