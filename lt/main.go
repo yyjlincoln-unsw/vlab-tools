@@ -37,7 +37,7 @@ func main() {
 
 	// Search from local executable
 	for _, path := range EXECUTABLE_PATHS {
-		executable := fmt.Sprintf("%v%v%v", path, os.PathSeparator, execName)
+		executable := fmt.Sprintf("%v%c%v", path, os.PathSeparator, execName)
 		if _, err := os.Stat(executable); err == nil {
 			// Execute the command.
 			cmd := exec.Command(executable, args[1:]...)
