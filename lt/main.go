@@ -51,8 +51,10 @@ func main() {
 			}
 
 			if err = cmd.Wait(); err != nil {
-				fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-				os.Exit(1)
+				// fmt.Fprintf(os.Stderr, "%v\n", err)
+				if exitError, ok := err.(*exec.ExitError); ok {
+					os.Exit(exitError.ExitCode())
+				}
 			}
 
 			executed = true
