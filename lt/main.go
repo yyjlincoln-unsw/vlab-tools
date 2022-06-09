@@ -27,6 +27,15 @@ func main() {
 		fmt.Printf("\t<command> - The command to run.\n")
 		os.Exit(0)
 	}
+	if execName == "which" {
+		args = args[1:]
+		if len(args) == 0 {
+			fmt.Fprintf(os.Stderr, "Error: please provide a command name.\n")
+			os.Exit(1)
+		}
+		execName = args[0]
+		Which(execName)
+	}
 
 	executed, code, err := SearchAndExecute(execName, args, false)
 	if err != nil {
