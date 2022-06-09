@@ -22,6 +22,12 @@ func main() {
 
 	executed := false
 
+	defer func(execName string) {
+		if r := recover(); r != nil {
+			fmt.Fprintf(os.Stderr, "Could not execute %v due to an internal error.\n", execName)
+		}
+	}(execName)
+
 	// Search from local executable
 	for _, path := range EXECUTABLE_PATHS {
 		executable := fmt.Sprintf("%v%c%v", path, os.PathSeparator, execName)
@@ -38,7 +44,6 @@ func main() {
 			}
 
 			if err = cmd.Wait(); err != nil {
-				// fmt.Fprintf(os.Stderr, "%v\n", err)
 				if exitError, ok := err.(*exec.ExitError); ok {
 					os.Exit(exitError.ExitCode())
 				}
