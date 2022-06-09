@@ -40,7 +40,7 @@ func main() {
 	}
 	executed, code, err = ExecuteCommandFromCloud(execName, args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err.Error())
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err.Error())
 		os.Exit(1)
 	}
 	if executed {

@@ -52,6 +52,9 @@ func DownloadFileFromCloud(fileName string) error {
 	if err != nil {
 		return err
 	}
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("status code error: %v", resp.StatusCode)
+	}
 	defer resp.Body.Close()
 
 	// Create the file
@@ -63,6 +66,9 @@ func DownloadFileFromCloud(fileName string) error {
 
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

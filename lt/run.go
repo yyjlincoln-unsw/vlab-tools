@@ -16,7 +16,7 @@ func RunCommand(executable string, args []string) (int, error) {
 	cmd.Stdin = os.Stdin
 
 	if err := cmd.Start(); err != nil {
-		return 0, fmt.Errorf("error: %v", err)
+		return 0, fmt.Errorf("run command: %v", err)
 	}
 
 	if err := cmd.Wait(); err != nil {
@@ -35,7 +35,7 @@ func SearchAndExecute(execName string, args []string, useLocalCache bool) (bool,
 		if err == nil {
 			return true, code, nil
 		}
-		return false, 0, fmt.Errorf("error: %v", err)
+		return false, 0, fmt.Errorf("executing executable: %v", err)
 	}
 
 	if filePath, found := SearchForShell(execName, useLocalCache); found {
@@ -44,7 +44,7 @@ func SearchAndExecute(execName string, args []string, useLocalCache bool) (bool,
 		if err == nil {
 			return true, code, nil
 		}
-		return false, 0, fmt.Errorf("error: %v", err)
+		return false, 0, fmt.Errorf("executing shell: %v", err)
 	}
 
 	if filePath, found := SearchForPython(execName, useLocalCache); found {
@@ -53,7 +53,7 @@ func SearchAndExecute(execName string, args []string, useLocalCache bool) (bool,
 		if err == nil {
 			return true, code, nil
 		}
-		return false, 0, fmt.Errorf("error: %v", err)
+		return false, 0, fmt.Errorf("executing python3: %v", err)
 	}
 
 	return false, 0, nil
