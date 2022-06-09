@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-const VERSION = "v1.0"
+const VERSION = "v1.1"
 
 func main() {
 	selfExec := os.Args[0]
