@@ -1,7 +1,5 @@
 echo "Installing $1..."
-if [ ! -d "~/bin" ]; then
-  mkdir ~/bin
-fi
+mkdir -p ~/bin
 # This is also a shadow - it will look into
 # the discoverable directories and find the 
 # file during runtime.
