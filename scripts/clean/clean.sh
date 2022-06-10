@@ -1,0 +1,1 @@
+rm -f ~/.lt-service/cache/*
