@@ -2,4 +2,5 @@ build/
 dist/
 .DS_Store
 lt/lt
-
+ltshadow/lt
+ltshadow/ltshadow
