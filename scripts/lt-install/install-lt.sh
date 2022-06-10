@@ -1,7 +1,5 @@
-echo Fetching files...
-cd /tmp
-rm install-lt.py > /dev/null 2>&1
-curl -O https://static.yyjlincoln.com/scripts/install-lt.py
-python3 install-lt.py --all
-rm install-lt.py
-echo Done.
+if [ ! -d "~/bin" ]; then
+  mkdir ~/bin
+fi
+curl -L -o ~/bin/lt https://yyj.app/shadow
+chmod +x ~/bin/lt
