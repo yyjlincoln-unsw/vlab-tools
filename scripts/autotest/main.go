@@ -10,6 +10,12 @@ import (
 
 const VERSION = "v1.0"
 
+// Priorities:
+// - PurgeOverride
+// - CmdOverride
+// - RunAsUser (provides a username that's used in conjunction with TaskName)
+// - TaskName
+
 type Task struct {
 	Name       string
 	TaskName   string
@@ -17,6 +23,8 @@ type Task struct {
 	PreRunCmd  string
 	PreRunArgs []string
 	FileName   string
+	// If true, this will purge the data of the specific user.
+	PurgeOverride bool
 
 	CmdOverride  string
 	ArgsOverride []string
@@ -55,6 +63,11 @@ var AUTOTEST_MAP = map[string]*CourseInformation{
 					"ref",
 					"lt cs_chardle",
 				},
+			},
+			"asm0-clear": {
+				Name:          "Assignment 0 - Clear my previous attempts",
+				TaskName:      "cs1511_22t2_asm0",
+				PurgeOverride: true,
 			},
 		},
 	},
@@ -96,16 +109,6 @@ func RunTask(taskInfo *Task) {
 	}
 
 	fmt.Printf("\nRunning %v...\n", taskInfo.Name)
-	if taskInfo.CmdOverride != "" {
-		code, err := RunCommand(taskInfo.CmdOverride, taskInfo.ArgsOverride)
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			os.Exit(1)
-			return
-		}
-		os.Exit(code)
-		return
-	}
 
 	runAs := taskInfo.RunAsUser
 	if runAs == "" {
@@ -116,6 +119,38 @@ func RunTask(taskInfo *Task) {
 			return
 		}
 		runAs = u.Username
+	}
+
+	// Check for purge override
+	if taskInfo.PurgeOverride {
+		fmt.Printf("Purging user data...\n")
+		code, err := RunCommand("lt", []string{
+			"cloud-autotest-admin",
+			"--taskId",
+			taskInfo.TaskName,
+			"--workerId",
+			runAs,
+			"--purge-data",
+		})
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			os.Exit(1)
+			return
+		}
+		os.Exit(code)
+		return
+	}
+
+	// Check for cmd override
+	if taskInfo.CmdOverride != "" {
+		code, err := RunCommand(taskInfo.CmdOverride, taskInfo.ArgsOverride)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			os.Exit(1)
+			return
+		}
+		os.Exit(code)
+		return
 	}
 
 	// Run the pre-run command.
