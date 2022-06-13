@@ -21,32 +21,38 @@ func GetCurrentUser() string {
 
 type Task struct {
 	Name       string
+	Identifier string
 	CommandSet *commands.CommandSet
 }
 
 type CourseInformation struct {
-	ID         string
+	Identifier string
 	CourseName string
-	Tasks      map[string]*Task
+	Tasks      []*Task
 }
 
 func main() {
 	fmt.Printf("LT Autotest %v\nA wrapper of cloud-autotest that provides a nice UI.\n\n", VERSION)
 	fmt.Printf("Please select one of the courses: \n")
 	for key := range AUTOTEST_MAP {
-		fmt.Printf("\t%v:\t%v\n", key, AUTOTEST_MAP[key].CourseName)
+		fmt.Printf("\t%v:\t%v\n", AUTOTEST_MAP[key].Identifier, AUTOTEST_MAP[key].CourseName)
 	}
 	var courseId string
 	fmt.Printf("\nCourse: ")
 	fmt.Scanln(&courseId)
-	courseInfo := AUTOTEST_MAP[courseId]
+	var courseInfo *CourseInformation = nil
+	for i := range AUTOTEST_MAP {
+		if AUTOTEST_MAP[i].Identifier == courseId {
+			courseInfo = AUTOTEST_MAP[i]
+		}
+	}
 	if courseInfo == nil {
 		fmt.Printf("Invalid course ID.\n")
 		os.Exit(1)
 	}
 	fmt.Printf("\n\nPlease select one of the tasks: \n")
 	for key := range courseInfo.Tasks {
-		fmt.Printf("\t%v:\t%v\n", key, courseInfo.Tasks[key].Name)
+		fmt.Printf("\t%v:\t%v\n", courseInfo.Tasks[key].Identifier, courseInfo.Tasks[key].Name)
 	}
 	if len(courseInfo.Tasks) == 0 {
 		fmt.Printf("\tNo task is available at the moment.\n")
@@ -54,7 +60,13 @@ func main() {
 	fmt.Printf("\nTask: ")
 	var taskId string
 	fmt.Scanln(&taskId)
-	taskInfo := courseInfo.Tasks[taskId]
+	var taskInfo *Task = nil
+	for key := range courseInfo.Tasks {
+		if courseInfo.Tasks[key].Identifier == taskId {
+			taskInfo = courseInfo.Tasks[key]
+			break
+		}
+	}
 	if taskInfo == nil {
 		fmt.Printf("Invalid task ID.\n")
 		os.Exit(1)

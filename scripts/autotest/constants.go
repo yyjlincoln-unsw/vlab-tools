@@ -8,17 +8,18 @@ import (
 
 var randNumber = fmt.Sprintf("%v", rand.Intn(1000000))
 
-var AUTOTEST_MAP = map[string]*CourseInformation{
-	"cs1511": Class_CS1511,
-	"cs2521": Class_CS2521,
+var AUTOTEST_MAP = []*CourseInformation{
+	Class_CS1511,
+	Class_CS2521,
 }
 
 var Class_CS1511 = &CourseInformation{
-	ID:         "cs1511",
+	Identifier: "cs1511",
 	CourseName: "COMP1511 - Term 2, 2022",
-	Tasks: map[string]*Task{
-		"asm0-test": {
-			Name: "Assignment 0 - Test your code",
+	Tasks: []*Task{
+		{
+			Identifier: "asm0-test",
+			Name:       "Assignment 0 - Test your code",
 			CommandSet: &commands.CommandSet{
 				Commands: []commands.Command{
 					{
@@ -41,8 +42,9 @@ var Class_CS1511 = &CourseInformation{
 				},
 			},
 		},
-		"asm0-reference": {
-			Name: "Assignment 0 - Generate Reference Outputs",
+		{
+			Identifier: "asm0-reference",
+			Name:       "Assignment 0 - Generate Reference Outputs",
 			CommandSet: &commands.CommandSet{
 				Commands: []commands.Command{
 					{
@@ -57,8 +59,9 @@ var Class_CS1511 = &CourseInformation{
 				},
 			},
 		},
-		"asm0-clear": {
-			Name: "Assignment 0 - Clear my previous attempts",
+		{
+			Identifier: "asm0-clear",
+			Name:       "Assignment 0 - Clear my previous attempts",
 			CommandSet: &commands.CommandSet{
 				Commands: []commands.Command{
 					{
@@ -75,13 +78,26 @@ var Class_CS1511 = &CourseInformation{
 				},
 			},
 		},
+		{
+			Identifier: "asm0-style",
+			Name:       "Assignment 0 - Style Check",
+			CommandSet: &commands.CommandSet{
+				Commands: []commands.Command{
+					{
+						Command: "1511",
+						Args: []string{
+							"style",
+							"cs_chardle.c",
+						},
+					},
+				},
+			},
+		},
 	},
 }
 
 var Class_CS2521 = &CourseInformation{
-	ID:         "cs2521",
+	Identifier: "cs2521",
 	CourseName: "COMP2521 - Term 2, 2022",
-	Tasks:      map[string]*Task{
-		
-	},
+	Tasks:      []*Task{},
 }
