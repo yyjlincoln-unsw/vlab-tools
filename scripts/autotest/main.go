@@ -1,6 +1,7 @@
 package main
 
 import (
+	"autotest/commands"
 	"fmt"
 	"math/rand"
 	"os"
@@ -10,6 +11,16 @@ import (
 
 const VERSION = "v1.0"
 
+func GetCurrentUser() string {
+	u, err := user.Current()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+		return ""
+	}
+	return u.Username
+}
+
 // Priorities:
 // - PurgeOverride
 // - CmdOverride
@@ -18,16 +29,7 @@ const VERSION = "v1.0"
 
 type Task struct {
 	Name       string
-	TaskName   string
-	RunAsUser  string
-	PreRunCmd  string
-	PreRunArgs []string
-	FileName   string
-	// If true, this will purge the data of the specific user.
-	PurgeOverride bool
-
-	CmdOverride  string
-	ArgsOverride []string
+	CommandSet *commands.CommandSet
 }
 
 type CourseInformation struct {
@@ -44,30 +46,62 @@ var AUTOTEST_MAP = map[string]*CourseInformation{
 		CourseName: "COMP1511",
 		Tasks: map[string]*Task{
 			"asm0-test": {
-				Name:      "Assignment 0 - Test your code",
-				TaskName:  "cs1511_22t2_asm0",
-				PreRunCmd: "dcc",
-				PreRunArgs: []string{
-					"-o",
-					"/tmp/cs_chardle_build_" + randNumber,
-					"cs_chardle.c",
+				Name: "Assignment 0 - Test your code",
+				CommandSet: &commands.CommandSet{
+					Commands: []commands.Command{
+						{
+							Command: "dcc",
+							Args: []string{
+								"-o",
+								"/tmp/cs_chardle_build_" + randNumber,
+								"cs_chardle.c",
+							},
+						},
+						{
+							Command: "lt",
+							Args: []string{
+								"cloud-autotest",
+								"cs1511_22t2_asm0",
+								GetCurrentUser(),
+								"/tmp/cs_chardle_build_" + randNumber,
+							},
+						},
+					},
 				},
-				FileName: "/tmp/cs_chardle_build_" + randNumber,
 			},
 			"asm0-reference": {
-				Name:        "Assignment 0 - Generate Reference Outputs",
-				CmdOverride: "lt",
-				ArgsOverride: []string{
-					"cloud-autotest",
-					"cs1511_22t2_asm0",
-					"ref",
-					"lt cs_chardle",
+				Name: "Assignment 0 - Generate Reference Outputs",
+				CommandSet: &commands.CommandSet{
+					Commands: []commands.Command{
+						{
+							Command: "lt",
+							Args: []string{
+								"cloud-autotest",
+								"cs1511_22t2_asm0",
+								"ref",
+								"lt cs_chardle",
+							},
+						},
+					},
 				},
 			},
 			"asm0-clear": {
-				Name:          "Assignment 0 - Clear my previous attempts",
-				TaskName:      "cs1511_22t2_asm0",
-				PurgeOverride: true,
+				Name: "Assignment 0 - Clear my previous attempts",
+				CommandSet: &commands.CommandSet{
+					Commands: []commands.Command{
+						{
+							Command: "lt",
+							Args: []string{
+								"cloud-autotest-admin",
+								"--taskId",
+								"cs1511_22t2_asm0",
+								"--workerId",
+								GetCurrentUser(),
+								"--purge-data",
+							},
+						},
+					},
+				},
 			},
 		},
 	},
@@ -110,74 +144,9 @@ func RunTask(taskInfo *Task) {
 
 	fmt.Printf("\nRunning %v...\n", taskInfo.Name)
 
-	runAs := taskInfo.RunAsUser
-	if runAs == "" {
-		u, err := user.Current()
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			os.Exit(1)
-			return
-		}
-		runAs = u.Username
-	}
-
-	// Check for purge override
-	if taskInfo.PurgeOverride {
-		fmt.Printf("Purging user data...\n")
-		code, err := RunCommand("lt", []string{
-			"cloud-autotest-admin",
-			"--taskId",
-			taskInfo.TaskName,
-			"--workerId",
-			runAs,
-			"--purge-data",
-		})
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			os.Exit(1)
-			return
-		}
-		os.Exit(code)
-		return
-	}
-
-	// Check for cmd override
-	if taskInfo.CmdOverride != "" {
-		code, err := RunCommand(taskInfo.CmdOverride, taskInfo.ArgsOverride)
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			os.Exit(1)
-			return
-		}
-		os.Exit(code)
-		return
-	}
-
-	// Run the pre-run command.
-	if taskInfo.PreRunCmd != "" {
-		code, err := RunCommand(taskInfo.PreRunCmd, taskInfo.PreRunArgs)
-		if err != nil {
-			fmt.Printf("Error: %v\n", err)
-			os.Exit(1)
-			return
-		}
-		if code != 0 {
-			fmt.Printf("Error: Pre-run command failed.\n")
-			os.Exit(1)
-			return
-		}
-	}
-
-	code, err := RunCommand("lt", []string{
-		"cloud-autotest",
-		taskInfo.TaskName,
-		runAs,
-		taskInfo.FileName,
-	})
+	code, err := commands.ExecuteCommandSet(taskInfo.CommandSet)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-		return
 	}
 	os.Exit(code)
 }
