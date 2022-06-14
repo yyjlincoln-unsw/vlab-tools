@@ -7,7 +7,7 @@ import (
 	"os/user"
 )
 
-const VERSION = "v1.1"
+const VERSION = "v1.2"
 
 func GetCurrentUser() string {
 	u, err := user.Current()
