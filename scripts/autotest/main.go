@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const VERSION = "v1.2.1"
+const VERSION = "v1.2.2"
 
 func main() {
 	args := os.Args[1:]

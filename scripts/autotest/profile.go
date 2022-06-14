@@ -8,7 +8,12 @@ import (
 
 const PROFILE_PATH = "/home/z5423219/local-public/internals/profiles.json"
 
+var NoProfile = false
+
 var PROFILES map[string]Profile = (func() map[string]Profile {
+	if NoProfile {
+		return map[string]Profile{}
+	}
 	var profiles map[string]Profile = map[string]Profile{}
 	content, err := ioutil.ReadFile(PROFILE_PATH)
 	if err != nil {
@@ -30,6 +35,9 @@ type Profile struct {
 }
 
 func GetProfile(key string) *Profile {
+	if NoProfile {
+		return nil
+	}
 	if val, ok := PROFILES[key]; ok {
 		return &val
 	}
