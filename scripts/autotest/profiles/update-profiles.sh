@@ -1,1 +1,1 @@
-cp profile.json ~/local-public/internals/profile.json
+cp profiles.json ~/local-public/internals/profiles.json
