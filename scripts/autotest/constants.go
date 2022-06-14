@@ -4,9 +4,33 @@ import (
 	"autotest/commands"
 	"fmt"
 	"math/rand"
+	"os"
+	"os/user"
 
 	"github.com/fatih/color"
 )
+
+type Task struct {
+	Name       string
+	Identifier string
+	CommandSet *commands.CommandSet
+}
+
+type CourseInformation struct {
+	Identifier string
+	CourseName string
+	Tasks      []*Task
+}
+
+func GetCurrentUser() string {
+	u, err := user.Current()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+		return ""
+	}
+	return u.Username
+}
 
 var randNumber = fmt.Sprintf("%v", rand.Intn(1000000))
 
