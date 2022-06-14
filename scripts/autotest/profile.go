@@ -12,13 +12,13 @@ var PROFILES map[string]Profile = (func() map[string]Profile {
 	var profiles map[string]Profile = map[string]Profile{}
 	content, err := ioutil.ReadFile(PROFILE_PATH)
 	if err != nil {
-		ErrorOutput("Error: Could not read profiles: read: %v", err)
-		fmt.Printf("\n")
+		// ErrorOutput("Error: Could not read profiles: read: %v", err)
+		// fmt.Printf("\n")
 		return profiles
 	}
 	if err := json.Unmarshal(content, &profiles); err != nil {
-		ErrorOutput("Error: could not read profiles: unmarshal: %v", err)
-		fmt.Printf("\n")
+		// ErrorOutput("Error: could not read profiles: unmarshal: %v", err)
+		// fmt.Printf("\n")
 		return profiles
 	}
 	return profiles

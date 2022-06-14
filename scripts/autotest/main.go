@@ -9,6 +9,9 @@ import (
 const VERSION = "v1.2"
 
 func main() {
+	args := os.Args[1:]
+	DealWithArgs(args)
+
 	fmt.Printf("LT Autotest %v\nA wrapper of cloud-autotest that provides a nice UI.\n", VERSION)
 	courseInfo := AskForCourseInfo()
 	if courseInfo == nil {

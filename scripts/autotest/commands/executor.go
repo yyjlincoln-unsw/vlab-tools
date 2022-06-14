@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/fatih/color"
 )
 
 type Command struct {
@@ -15,9 +17,24 @@ type CommandSet struct {
 	Commands []Command
 }
 
+var ShowCommands = false
+
 // Runs the command in interactive mode, returns the return code
 // and error (not the program's error).
 func runCommand(executable string, args []string) (int, error) {
+	if ShowCommands {
+		commandsToPrint := append([]string{executable}, args...)
+		var command string
+		for _, v := range commandsToPrint {
+			command += v + " "
+		}
+		if len(command) != 0 {
+			command = command[0 : len(command)-1]
+		}
+		color.Set(color.FgHiYellow)
+		fmt.Printf("$ %v\n", command)
+		color.Unset()
+	}
 	// Execute the command.
 	cmd := exec.Command(executable, args...)
 	cmd.Stdout = os.Stdout
