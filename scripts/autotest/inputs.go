@@ -3,11 +3,10 @@ package main
 import "fmt"
 
 func AskForCourseInfo() *CourseInformation {
+	TitleOutput("Course Selection")
 	if courseInfoFromProfile := CheckProfileForCourseInfo(); courseInfoFromProfile != nil {
 		return courseInfoFromProfile
 	}
-
-	TitleOutput("Course Selection")
 	fmt.Printf("Please select one of the courses: \n")
 	for key := range AUTOTEST_MAP {
 		fmt.Printf("\t%v:\t%v\n", AUTOTEST_MAP[key].Identifier, AUTOTEST_MAP[key].CourseName)
