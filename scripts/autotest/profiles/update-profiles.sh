@@ -1,0 +1,1 @@
+cp profile.json ~/local-public/internals/profile.json

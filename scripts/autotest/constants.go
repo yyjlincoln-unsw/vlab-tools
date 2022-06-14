@@ -20,6 +20,7 @@ var ErrorOutput = func(format string, args ...interface{}) {
 	fmt.Printf(format, args...)
 	color.Unset()
 }
+
 var TitleOutput = func(format string, args ...interface{}) {
 	fmt.Printf("\n\n")
 	color.Set(color.BgWhite).Add(color.FgBlack)
