@@ -79,6 +79,13 @@ var Class_CS1511 = &CourseInformation{
 							"/tmp/cs_chardle_build_" + randNumber,
 						},
 					},
+					// Cleanup
+					{
+						Command: "rm",
+						Args: []string{
+							"/tmp/cs_chardle_build_" + randNumber,
+						},
+					},
 				},
 			},
 		},
