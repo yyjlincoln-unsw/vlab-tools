@@ -44,7 +44,7 @@ func CheckProfileForCourseInfo() *CourseInformation {
 	class := profile.Class
 	for _, v := range AUTOTEST_MAP {
 		if v.Identifier == class {
-			fmt.Printf("Current course for %v: %v (%v)...\n", profile.Name, v.CourseName, v.Identifier)
+			fmt.Printf("The current course for %v is %v (%v)\n", profile.Name, v.CourseName, v.Identifier)
 			return v
 		}
 	}
