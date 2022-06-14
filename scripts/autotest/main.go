@@ -32,7 +32,8 @@ type CourseInformation struct {
 }
 
 func main() {
-	fmt.Printf("LT Autotest %v\nA wrapper of cloud-autotest that provides a nice UI.\n\n", VERSION)
+	fmt.Printf("LT Autotest %v\nA wrapper of cloud-autotest that provides a nice UI.\n", VERSION)
+	TitleOutput("Course Selection")
 	fmt.Printf("Please select one of the courses: \n")
 	for key := range AUTOTEST_MAP {
 		fmt.Printf("\t%v:\t%v\n", AUTOTEST_MAP[key].Identifier, AUTOTEST_MAP[key].CourseName)
@@ -47,15 +48,16 @@ func main() {
 		}
 	}
 	if courseInfo == nil {
-		fmt.Printf("Invalid course ID.\n")
+		ErrorOutput("Invalid course ID.\n")
 		os.Exit(1)
 	}
-	fmt.Printf("\n\nPlease select one of the tasks: \n")
+	TitleOutput("Task Selection")
+	fmt.Printf("Please select one of the tasks: \n")
 	for key := range courseInfo.Tasks {
 		fmt.Printf("\t%v:\t%v\n", courseInfo.Tasks[key].Identifier, courseInfo.Tasks[key].Name)
 	}
 	if len(courseInfo.Tasks) == 0 {
-		fmt.Printf("\tNo task is available at the moment.\n")
+		ErrorOutput("\tNo task is available at the moment.\n")
 	}
 	fmt.Printf("\nTask: ")
 	var taskId string
@@ -68,7 +70,7 @@ func main() {
 		}
 	}
 	if taskInfo == nil {
-		fmt.Printf("Invalid task ID.\n")
+		ErrorOutput("Invalid task ID.\n")
 		os.Exit(1)
 	}
 	RunTask(taskInfo)
@@ -76,7 +78,7 @@ func main() {
 
 func RunTask(taskInfo *Task) {
 	if taskInfo == nil {
-		fmt.Printf("Invalid task info.\n")
+		ErrorOutput("Invalid task info.\n")
 		os.Exit(1)
 	}
 
@@ -84,7 +86,7 @@ func RunTask(taskInfo *Task) {
 
 	code, err := commands.ExecuteCommandSet(taskInfo.CommandSet)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		ErrorOutput("Error: %v\n", err)
 	}
 	os.Exit(code)
 }

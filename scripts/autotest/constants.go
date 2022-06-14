@@ -4,6 +4,8 @@ import (
 	"autotest/commands"
 	"fmt"
 	"math/rand"
+
+	"github.com/fatih/color"
 )
 
 var randNumber = fmt.Sprintf("%v", rand.Intn(1000000))
@@ -11,6 +13,19 @@ var randNumber = fmt.Sprintf("%v", rand.Intn(1000000))
 var AUTOTEST_MAP = []*CourseInformation{
 	Class_CS1511,
 	Class_CS2521,
+}
+
+var ErrorOutput = func(format string, args ...interface{}) {
+	color.Set(color.FgRed)
+	fmt.Printf(format, args...)
+	color.Unset()
+}
+var TitleOutput = func(format string, args ...interface{}) {
+	fmt.Printf("\n\n")
+	color.Set(color.BgWhite).Add(color.FgBlack)
+	fmt.Printf(format, args...)
+	color.Unset()
+	fmt.Printf("\n\n")
 }
 
 var Class_CS1511 = &CourseInformation{
@@ -99,5 +114,20 @@ var Class_CS1511 = &CourseInformation{
 var Class_CS2521 = &CourseInformation{
 	Identifier: "cs2521",
 	CourseName: "COMP2521 - Term 2, 2022",
-	Tasks:      []*Task{},
+	Tasks: []*Task{
+		{
+			Identifier: "asm1-test",
+			Name:       "Assignment 1 - Test your code",
+			CommandSet: &commands.CommandSet{
+				Commands: []commands.Command{
+					{
+						Command: "echo",
+						Args: []string{
+							"This feature is not available at the moment.",
+						},
+					},
+				},
+			},
+		},
+	},
 }
