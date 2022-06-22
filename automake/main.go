@@ -8,9 +8,14 @@ import (
 	"strings"
 )
 
+var WATCH_EXTENSIONS []string = []string{
+	"c",
+	"h",
+}
+
 func main() {
 	if len(os.Args) < 2 {
-		help := "Automatically make when file changes, and execute a file name.\nUsage: %v <filename> [args...]\n"
+		help := "Automatically make when file changes, and execute a file IN THE CURRENT DIRECTORY (must be a name or starts with \"./\").\nUsage: %v <filename> [args...]\n"
 		fmt.Fprintf(os.Stderr, help, os.Args[0])
 		os.Exit(1)
 	}
@@ -50,11 +55,7 @@ func main() {
 
 func IsFileEligible(file string, targetFileName string) bool {
 	ext := GetExtension(file)
-	for _, curr := range []string{
-		"c",
-		"h",
-		"Makefile",
-	} {
+	for _, curr := range WATCH_EXTENSIONS {
 		if curr == ext {
 			return true
 		}
