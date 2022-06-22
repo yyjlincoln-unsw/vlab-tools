@@ -1,4 +1,4 @@
-module automake
+module xmake
 
 go 1.13
 
