@@ -70,8 +70,9 @@ func ExecWithKillSig(killSig chan int, next func(), command string, args ...stri
 				return
 			}
 			if code != 0 {
-				fmt.Printf("%v\n", color.RedString(fmt.Sprintf("Error: process exited with status %d.", code)))
+				fmt.Printf("\n%v\n", color.RedString(fmt.Sprintf("Error: process exited with status %d.", code)))
 			} else {
+				fmt.Printf("\n%v\n", color.GreenString(fmt.Sprintf("Process exited with status %d.", code)))
 				isKilled := false
 				select {
 				case <-killSig:
