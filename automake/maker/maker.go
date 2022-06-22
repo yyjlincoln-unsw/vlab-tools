@@ -101,11 +101,16 @@ func ReMake(fileName string, args []string) chan int {
 	fmt.Printf("%v\n", color.YellowString("Building..."))
 
 	killSig := make(chan int)
+	currentPwd, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("%v\n", color.RedString(fmt.Sprintf("An error occurred: %v", err)))
+		panic("Could not get pwd.")
+	}
+	filePath := fmt.Sprintf("%v%c%v", currentPwd, os.PathSeparator, fileName)
 
 	RunProgramCommand := func() {
 		ExecWithKillSig(killSig, func() {
-			// That's done
-		}, "sleep", "1")
+		}, filePath, args...)
 	}
 
 	MakeCommand := func() {
@@ -128,6 +133,12 @@ func ReMakeWithThrottle(fileName string, args []string) (bool, chan int) {
 	fmt.Printf("%v\n", color.YellowString("Building..."))
 
 	killSig := make(chan int)
+	currentPwd, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("%v\n", color.RedString(fmt.Sprintf("An error occurred: %v", err)))
+		panic("Could not get pwd.")
+	}
+	filePath := fmt.Sprintf("%v%c%v", currentPwd, os.PathSeparator, fileName)
 
 	go func() {
 		time.Sleep(1 * time.Second)
@@ -137,7 +148,7 @@ func ReMakeWithThrottle(fileName string, args []string) (bool, chan int) {
 			fmt.Printf("%v\n\n", color.GreenString("Successfully built, running the program..."))
 			ExecWithKillSig(killSig, func() {
 				// That's done
-			}, fileName, args...)
+			}, filePath, args...)
 		}
 
 		MakeCommand := func() {
