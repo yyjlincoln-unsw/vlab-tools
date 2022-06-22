@@ -15,7 +15,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fileName := GetFileName(os.Args[1])
+	targetFileName := GetFileName(os.Args[1])
 	args := os.Args[1:]
 
 	watcher, err := watcher.New("./")
@@ -25,17 +25,21 @@ func main() {
 		done <- 1
 		os.Exit(1)
 	}
+	_, currentKillSig := maker.ReMakeWithThrottle(targetFileName, args)
 
-	var currentKillSig chan int = nil
 	if _, err := watcher.OnChange(func(file string) {
-		if currentKillSig != nil {
-			// Kill previous
-			currentKillSig <- 1
-		}
-		if GetFileName(file) != fileName {
-			maker.ReMake(fileName, args)
-		} else {
-			fmt.Printf("Not remaking.\n")
+		if IsFileEligible(file, targetFileName) {
+			fmt.Printf("Change: %v\n", file)
+			if currentKillSig != nil {
+				// Kill previous
+				select {
+				case currentKillSig <- 1:
+				default:
+				}
+			}
+			if ran, killSig := maker.ReMakeWithThrottle(targetFileName, args); ran {
+				currentKillSig = killSig
+			}
 		}
 	}); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Could not create onChange handler: %v", err)
@@ -44,7 +48,42 @@ func main() {
 	defer watcher.Destroy()
 }
 
+func IsFileEligible(file string, targetFileName string) bool {
+	ext := GetExtension(file)
+	for _, curr := range []string{
+		"c",
+		"h",
+		"Makefile",
+	} {
+		if curr == ext {
+			return true
+		}
+	}
+	return false
+	// if GetFileName(file) == targetFileName {
+	// 	return false
+	// }
+	// if ext == "" {
+	// 	return false
+	// }
+	// if ext == "o" {
+	// 	return false
+	// }
+	// if ext == "tmp" {
+	// 	return false
+	// }
+}
+
 func GetFileName(path string) string {
 	split := strings.Split(path, fmt.Sprintf("%v", os.PathSeparator))
+	return split[len(split)-1]
+}
+
+func GetExtension(path string) string {
+	fileName := GetFileName(path)
+	split := strings.Split(fileName, ".")
+	if len(split) == 1 {
+		return ""
+	}
 	return split[len(split)-1]
 }

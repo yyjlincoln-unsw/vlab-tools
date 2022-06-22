@@ -38,8 +38,10 @@ func (w *watcher) pullChanges() {
 			if !ok {
 				return
 			}
-			for _, fn := range w.handlers {
-				fn(event.Name)
+			if event.Op == fsnotify.Write || event.Op == fsnotify.Create || event.Op == fsnotify.Remove {
+				for _, fn := range w.handlers {
+					fn(event.Name)
+				}
 			}
 		case err, ok := <-w.watcher.Errors:
 			if !ok {
