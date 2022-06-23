@@ -25,12 +25,14 @@ func RegisterHook(name string, callback func()) chan int {
 
 			done := make(chan int)
 			w.OnChange(func(file string) {
-				logging.Infof("Change: %v\n", file)
-				DebounceCallback(func() {
-					screen.Clear()
-					screen.MoveTopLeft()
-					callback()
-				})
+				if GetFileEligibility(file) {
+					logging.Infof("Change: %v\n", file)
+					DebounceCallback(func() {
+						screen.Clear()
+						screen.MoveTopLeft()
+						callback()
+					})
+				}
 			})
 			<-done
 		}

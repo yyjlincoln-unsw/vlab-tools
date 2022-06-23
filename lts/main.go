@@ -11,6 +11,8 @@ import (
 	"syscall"
 )
 
+const VERSION = "1.0"
+
 func main() {
 	if len(os.Args) == 0 {
 		logging.Errorf("Error: No argument was provided to the program.\n")
@@ -22,6 +24,10 @@ func main() {
 		os.Exit(1)
 	}
 	CommandName := Args[0]
+	// Check if it's internal
+	if HandleBuiltInCommand(CommandName) {
+		return
+	}
 	// Read the command list
 	list, err := finder.ReadCommandList()
 	if err != nil {
@@ -94,8 +100,50 @@ func main() {
 	hooks.WaitForAllHooks(append(dones, done))
 }
 
+func HandleBuiltInCommand(cmd string) bool {
+	switch cmd {
+	case "list":
+		fmt.Printf("Looking for lts.json...\n")
+		path, err := finder.FindLTS()
+		if err != nil {
+			logging.Errorf("LTS lookup failure: %v", err)
+			os.Exit(1)
+			return true
+		}
+		logging.Infof("The configuration file is found at:\n")
+		logging.Infof("%v\n\n", path)
+		logging.Infof("Available commands...\n")
+		list, err := finder.ReadCommandList()
+		if err != nil {
+			logging.Errorf("Parse failure: %v\n", err)
+			os.Exit(1)
+			return true
+		}
+		for name, exec := range list.Scripts {
+			logging.Successf("%v\t", name)
+			fmt.Printf("Hooks=")
+			hooks := list.GetHooks(name)
+			logging.Warnf("%v\t", hooks)
+			fmt.Printf("Command=")
+			fmt.Printf("%v\n", exec)
+		}
+		return true
+	default:
+		return false
+	}
+}
+
 func ShowHelp(ExecutableName string) {
-	fmt.Printf("Usage:\n")
-	fmt.Printf("\t%v [name]\n\n", ExecutableName)
-	fmt.Printf("This program will try and read lts.json from the current directory or the parent directories, then execute the script using shell.\n")
+	logging.Warnf("LTS - Scripts Service (as a part of Lincoln's Tools)\n")
+	logging.Warnf("Version: %s\n\n", VERSION)
+	logging.Infof("Usage:\n")
+	fmt.Printf("\t%v <name>|list\n\n", ExecutableName)
+	fmt.Printf("This program will try and read lts.json from the current directory or the parent directories, then execute the script using shell.\n\n")
+	logging.Infof("Built in commands:\n")
+	fmt.Printf("list:\n")
+	fmt.Printf("\tLists all user-defined commands and the file that defined them.\n\n")
+
+	logging.Infof("Hooks:\n")
+	fmt.Printf("change:\n \tListens for file changes in the current directory, and if a change is detected, kill the current command process (and child processes) then rerun the same command.\n")
+	fmt.Printf("\tSupported extensions: %v\n", hooks.ELIGIBLE_FILE_EXTENSIONS)
 }
