@@ -90,10 +90,12 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 // Returns the Kill function
 func ExecuteShell(command string, onCompletion func(int, error)) (chan int, func(), error) {
 	cmd := exec.Command("sh", "-c", command)
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
+
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}
+
 	if err := cmd.Start(); err != nil {
 		done := make(chan int)
 		done <- 1
