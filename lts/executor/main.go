@@ -72,8 +72,6 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 			return
 		}
 		killed = true
-		// Sends the KillSig
-		kill <- 1
 		// For some reasons, killSig does not
 		// work when there is no hook-triggered
 		// reruns. We're going to kill it here anyway.
@@ -84,6 +82,8 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 		cmd.Process.Kill()
 		cmd.Process.Release()
 		cmd.Process.Wait()
+		// Sends the KillSig
+		kill <- 1
 	}
 }
 

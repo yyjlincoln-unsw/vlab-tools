@@ -13,7 +13,7 @@ import (
 	"github.com/inancgumus/screen"
 )
 
-const VERSION = "v1.1.2"
+const VERSION = "v1.1.3"
 
 func main() {
 	if len(os.Args) == 0 {
@@ -98,7 +98,7 @@ func main() {
 		logging.Errorf("\n\nCleaning up...\n")
 		if currentKill != nil {
 			fn := *currentKill
-			fn()
+			go fn()
 		}
 
 		logging.Errorf("Exiting.\n")
