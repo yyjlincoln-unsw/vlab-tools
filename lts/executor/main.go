@@ -67,12 +67,23 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 	}()
 
 	return done, func() {
+		// Kill the program
 		if killed {
 			return
 		}
-		// Kill the program
 		killed = true
+		// Sends the KillSig
 		kill <- 1
+		// For some reasons, killSig does not
+		// work when there is no hook-triggered
+		// reruns. We're going to kill it here anyway.
+		pgid, err := syscall.Getpgid(cmd.Process.Pid)
+		if err == nil {
+			syscall.Kill(-pgid, syscall.SIGKILL)
+		}
+		cmd.Process.Kill()
+		cmd.Process.Release()
+		cmd.Process.Wait()
 	}
 }
 

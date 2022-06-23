@@ -13,7 +13,7 @@ import (
 	"github.com/inancgumus/screen"
 )
 
-const VERSION = "v1.1.1"
+const VERSION = "v1.1.2"
 
 func main() {
 	if len(os.Args) == 0 {
@@ -95,11 +95,13 @@ func main() {
 	signal.Notify(sigKill, syscall.SIGTERM, syscall.SIGABRT, os.Interrupt)
 	go func() {
 		<-sigKill
+		logging.Errorf("\n\nCleaning up...\n")
 		if currentKill != nil {
 			fn := *currentKill
 			fn()
 		}
-		logging.Errorf("\nExiting.\n")
+
+		logging.Errorf("Exiting.\n")
 		os.Exit(0)
 	}()
 
