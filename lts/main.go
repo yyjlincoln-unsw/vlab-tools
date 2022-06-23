@@ -91,7 +91,7 @@ func main() {
 		<-sigKill
 		if currentKill != nil {
 			fn := *currentKill
-			go fn()
+			fn()
 		}
 		logging.Errorf("\nExiting.\n")
 		os.Exit(0)

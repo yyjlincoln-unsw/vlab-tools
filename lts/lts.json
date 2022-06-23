@@ -1,8 +1,11 @@
 {
     "scripts": {
-        "test": "ping localhost"
+        "test": "ping localhost",
+        "test2": "ping localhost",
+        "test3": "ping localhost"
     },
     "hooks":{
-        "change": ["test"]
+        "change": ["test", "test2"],
+        "periodic": ["test2"]
     }
 }

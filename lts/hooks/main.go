@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"lts/logging"
 	"lts/watcher"
+	"time"
 
 	"github.com/inancgumus/screen"
 )
@@ -13,6 +14,14 @@ func RegisterHook(name string, callback func()) chan int {
 	done := make(chan int)
 
 	go func() {
+
+		callbackWrapped := func(reason string) {
+			screen.Clear()
+			screen.MoveTopLeft()
+			logging.Successf("%v [%v]\n\n", reason, name)
+			callback()
+		}
+
 		switch name {
 		case "change":
 			// File system change.
@@ -28,13 +37,16 @@ func RegisterHook(name string, callback func()) chan int {
 				if GetFileEligibility(file) {
 					logging.Infof("Change: %v\n", file)
 					DebounceCallback(func() {
-						screen.Clear()
-						screen.MoveTopLeft()
-						callback()
+						callbackWrapped("Change detected in " + file)
 					})
 				}
 			})
 			<-done
+		case "periodic":
+			for {
+				time.Sleep(30 * time.Second)
+				callbackWrapped("Periodic event")
+			}
 		}
 		fmt.Printf("Close %v\n", name)
 		done <- 1
