@@ -45,7 +45,7 @@ func RegisterHook(name string, callback func()) chan int {
 		case "periodic":
 			for {
 				time.Sleep(30 * time.Second)
-				callbackWrapped("Periodic event")
+				callbackWrapped("Periodic rerun")
 			}
 		}
 		fmt.Printf("Close %v\n", name)

@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/inancgumus/screen"
 )
 
 const VERSION = "1.0"
@@ -60,7 +62,11 @@ func main() {
 	// Get hooks
 	hooksForCommand := list.GetHooks(CommandName)
 	dones := []chan int{}
-	logging.Successf("Running with hooks: %v\n", hooksForCommand)
+	if len(hooksForCommand) > 0 {
+		screen.Clear()
+		screen.MoveTopLeft()
+		logging.Successf("Running with hooks: %v\n", hooksForCommand)
+	}
 	for _, v := range hooksForCommand {
 		dones = append(dones, hooks.RegisterHook(v, func() {
 			if currentKill != nil {
