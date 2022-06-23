@@ -13,7 +13,7 @@ import (
 	"github.com/inancgumus/screen"
 )
 
-const VERSION = "v1.1.0"
+const VERSION = "v1.1.1"
 
 func main() {
 	if len(os.Args) == 0 {
@@ -112,7 +112,7 @@ func HandleBuiltInCommand(cmd string) bool {
 		fmt.Printf("Looking for lts.json...\n")
 		path, err := finder.FindLTS()
 		if err != nil {
-			logging.Errorf("LTS lookup failure: %v", err)
+			logging.Errorf("LTS lookup failure: %v\n", err)
 			os.Exit(1)
 			return true
 		}
