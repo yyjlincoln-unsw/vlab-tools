@@ -1,7 +1,9 @@
 package finder
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -59,4 +61,52 @@ func FindFile(fileName string) (string, error) {
 
 func FindLTS() (string, error) {
 	return FindFile("lts.json")
+}
+
+// LTS Command List ADT
+
+type LTSCommandList struct {
+	commands map[string]string
+}
+
+func newLTSCommandList() LTSCommandList {
+	return LTSCommandList{
+		commands: map[string]string{},
+	}
+}
+
+func (list LTSCommandList) GetCommand(name string) (string, error) {
+	cmd, ok := list.commands[name]
+	if ok {
+		return cmd, nil
+	}
+	return "", fmt.Errorf("command not found: %v", name)
+}
+
+func (list LTSCommandList) addCommand(name string, command string) {
+	list.commands[name] = command
+}
+
+func ReadCommandList() (*LTSCommandList, error) {
+	// Try and find LTS
+	file, err := FindLTS()
+	if err != nil {
+		return nil, fmt.Errorf("in RadCommandList: %v", err)
+	}
+	// Read the file
+	content, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("in RadCommandList: %v", err)
+	}
+	// Unmarshal the JSON
+	commands := map[string]string{}
+	if err := json.Unmarshal(content, &commands); err != nil {
+		return nil, fmt.Errorf("in RadCommandList: %v", err)
+	}
+	// Load them into LTSCommandList
+	list := newLTSCommandList()
+	for k, v := range commands {
+		list.addCommand(k, v)
+	}
+	return &list, nil
 }
