@@ -2,7 +2,10 @@ package hooks
 
 import (
 	"fmt"
-	"time"
+	"lts/logging"
+	"lts/watcher"
+
+	"github.com/inancgumus/screen"
 )
 
 // Returns a blocking channel that, when the hook is dead, sends.
@@ -13,11 +16,23 @@ func RegisterHook(name string, callback func()) chan int {
 		switch name {
 		case "change":
 			// File system change.
-			for {
-				fmt.Printf("Change!")
-				time.Sleep(5 * time.Second)
-				callback()
+			w, err := watcher.New("./")
+
+			if err != nil {
+				logging.Errorf("Could not register change hook: %v", err)
+				break
 			}
+
+			done := make(chan int)
+			w.OnChange(func(file string) {
+				logging.Infof("Change: %v\n", file)
+				DebounceCallback(func() {
+					screen.Clear()
+					screen.MoveTopLeft()
+					callback()
+				})
+			})
+			<-done
 		}
 		fmt.Printf("Close %v\n", name)
 		done <- 1

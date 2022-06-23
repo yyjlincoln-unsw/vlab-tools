@@ -45,3 +45,43 @@ func Successf(format string, v ...interface{}) {
 		fmt.Printf("%v", coloredErrorString)
 	}
 }
+
+func Warnf(format string, v ...interface{}) {
+	if len(format) == 0 {
+		return
+	}
+	hasTrailingNewLine := false
+
+	if format[len(format)-1] == '\n' {
+		format = format[:len(format)-1]
+		hasTrailingNewLine = true
+	}
+
+	coloredErrorString := color.YellowString(fmt.Sprintf(format, v...))
+
+	if hasTrailingNewLine {
+		fmt.Printf("%v\n", coloredErrorString)
+	} else {
+		fmt.Printf("%v", coloredErrorString)
+	}
+}
+
+func Infof(format string, v ...interface{}) {
+	if len(format) == 0 {
+		return
+	}
+	hasTrailingNewLine := false
+
+	if format[len(format)-1] == '\n' {
+		format = format[:len(format)-1]
+		hasTrailingNewLine = true
+	}
+
+	coloredErrorString := color.BlueString(fmt.Sprintf(format, v...))
+
+	if hasTrailingNewLine {
+		fmt.Printf("%v\n", coloredErrorString)
+	} else {
+		fmt.Printf("%v", coloredErrorString)
+	}
+}

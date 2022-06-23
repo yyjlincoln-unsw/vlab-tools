@@ -48,13 +48,20 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 			cmd.Process.Kill()
 			cmd.Process.Release()
 			cmd.Process.Wait()
-			done <- 1
+			select {
+			case done <- 1:
+			default:
+			}
 			close(done)
 			return
 		case code := <-exitCode:
-			done <- 1
+			err := <-errWhenDone
+			onCompletion(code, err)
+			select {
+			case done <- 1:
+			default:
+			}
 			close(done)
-			onCompletion(code, <-errWhenDone)
 			return
 		}
 	}()

@@ -46,24 +46,20 @@ func main() {
 			if code != 0 {
 				logging.Errorf("Exit status %v\n", code)
 			} else {
-				logging.Successf("Command exited.\n")
+				logging.Successf("Command exited with code 0.\n")
 			}
 		})
-	}
-	done, kill, err := execute()
-	currentKill = &kill
-	if err != nil {
-		logging.Errorf("Error: %v\n", err)
 	}
 
 	// Get hooks
 	hooksForCommand := list.GetHooks(CommandName)
 	dones := []chan int{}
+	logging.Successf("Running with hooks: %v\n", hooksForCommand)
 	for _, v := range hooksForCommand {
 		dones = append(dones, hooks.RegisterHook(v, func() {
 			if currentKill != nil {
 				fn := *(currentKill)
-				fn()
+				go fn()
 			}
 
 			_, kill, err := execute()
@@ -73,6 +69,13 @@ func main() {
 				logging.Errorf("Error: %v\n", err)
 			}
 		}))
+	}
+
+	// Now, execute it
+	done, kill, err := execute()
+	currentKill = &kill
+	if err != nil {
+		logging.Errorf("Error: %v\n", err)
 	}
 
 	// Cleanup child when killed

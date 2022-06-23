@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "test": "echo Hello && ping localhost"
+        "test": "echo Hello; exit"
     },
     "hooks":{
         "change": ["test"]
