@@ -7,6 +7,8 @@ import (
 	"lts/hooks"
 	"lts/logging"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func main() {
@@ -63,13 +65,28 @@ func main() {
 				fn := *(currentKill)
 				fn()
 			}
+
 			_, kill, err := execute()
 			*currentKill = kill
+
 			if err != nil {
 				logging.Errorf("Error: %v\n", err)
 			}
 		}))
 	}
+
+	// Cleanup child when killed
+	sigKill := make(chan os.Signal, 3)
+	signal.Notify(sigKill, syscall.SIGTERM, syscall.SIGABRT, os.Interrupt)
+	go func() {
+		<-sigKill
+		if currentKill != nil {
+			fn := *currentKill
+			go fn()
+		}
+		logging.Errorf("\nExiting.\n")
+		os.Exit(0)
+	}()
 
 	hooks.WaitForAllHooks(append(dones, done))
 }

@@ -1,9 +1,9 @@
 package executor
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
+	"syscall"
 )
 
 // Returns a Kill function
@@ -29,8 +29,10 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 				close(errWhenDone)
 			}
 		} else {
-			errWhenDone <- nil
 			exitCode <- 0
+			close(exitCode)
+			errWhenDone <- nil
+			close(errWhenDone)
 		}
 	}()
 
@@ -38,15 +40,19 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 	go func() {
 		select {
 		case <-kill:
+			// Also kill its children
+			pgid, err := syscall.Getpgid(cmd.Process.Pid)
+			if err == nil {
+				syscall.Kill(-pgid, syscall.SIGKILL)
+			}
 			cmd.Process.Kill()
 			cmd.Process.Release()
+			cmd.Process.Wait()
 			done <- 1
-			fmt.Printf("Kill")
 			close(done)
 			return
 		case code := <-exitCode:
 			done <- 1
-			fmt.Printf("Done")
 			close(done)
 			onCompletion(code, <-errWhenDone)
 			return
@@ -66,6 +72,7 @@ func WaitForCompletionOrKill(cmd *exec.Cmd, onCompletion func(int, error)) (chan
 // Returns the Kill function
 func ExecuteShell(command string, onCompletion func(int, error)) (chan int, func(), error) {
 	cmd := exec.Command("sh", "-c", command)
+	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Stdin = os.Stdin
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout

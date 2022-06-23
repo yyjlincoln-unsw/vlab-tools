@@ -1,6 +1,9 @@
 package hooks
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // Returns a blocking channel that, when the hook is dead, sends.
 func RegisterHook(name string, callback func()) chan int {
@@ -11,7 +14,9 @@ func RegisterHook(name string, callback func()) chan int {
 		case "change":
 			// File system change.
 			for {
-				// Monitor for FS Change, and run the command
+				fmt.Printf("Change!")
+				time.Sleep(5 * time.Second)
+				callback()
 			}
 		}
 		fmt.Printf("Close %v\n", name)

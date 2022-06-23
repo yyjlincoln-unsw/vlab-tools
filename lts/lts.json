@@ -1,8 +1,8 @@
 {
     "scripts": {
-        "test": "echo Hello && sh"
+        "test": "echo Hello && ping localhost"
     },
     "hooks":{
-        "fileChange": ["test"]
+        "change": ["test"]
     }
 }
