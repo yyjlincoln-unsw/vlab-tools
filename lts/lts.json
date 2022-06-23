@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "test": "echo hello!"
+        "test": "echo Hello && sh"
     },
     "hooks":{
         "fileChange": ["test"]

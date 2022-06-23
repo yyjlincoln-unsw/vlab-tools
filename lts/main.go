@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"lts/executor"
 	"lts/finder"
+	"lts/hooks"
 	"lts/logging"
 	"os"
 )
@@ -25,24 +26,52 @@ func main() {
 		logging.Errorf("Error: Unable to read command: %v\n", err)
 		os.Exit(1)
 	}
+	// Get command
 	command, err := list.GetCommand(CommandName)
 	if err != nil {
 		logging.Errorf("Error: Unable to execute %v: %v\n", CommandName, err)
 		os.Exit(1)
 	}
-	hooks := list.GetHooks(CommandName)
-	fmt.Print(hooks)
-	code, err := executor.ExecuteShell(command)
+
+	// Execute the command
+	var currentKill *func()
+	execute := func() (chan int, func(), error) {
+		return executor.ExecuteShell(command, func(code int, err error) {
+			if err != nil {
+				logging.Errorf("%v", err)
+				return
+			}
+			if code != 0 {
+				logging.Errorf("Exit status %v\n", code)
+			} else {
+				logging.Successf("Command exited.\n")
+			}
+		})
+	}
+	done, kill, err := execute()
+	currentKill = &kill
 	if err != nil {
-		logging.Errorf("%v", err)
-		os.Exit(1)
+		logging.Errorf("Error: %v\n", err)
 	}
-	if code != 0 {
-		logging.Errorf("Exit status %v\n", code)
-	} else {
-		logging.Successf("Command exited.\n")
+
+	// Get hooks
+	hooksForCommand := list.GetHooks(CommandName)
+	dones := []chan int{}
+	for _, v := range hooksForCommand {
+		dones = append(dones, hooks.RegisterHook(v, func() {
+			if currentKill != nil {
+				fn := *(currentKill)
+				fn()
+			}
+			_, kill, err := execute()
+			*currentKill = kill
+			if err != nil {
+				logging.Errorf("Error: %v\n", err)
+			}
+		}))
 	}
-	os.Exit(code)
+
+	hooks.WaitForAllHooks(append(dones, done))
 }
 
 func ShowHelp(ExecutableName string) {
