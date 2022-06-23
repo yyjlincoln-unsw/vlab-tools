@@ -1,3 +1,8 @@
 {
-    "test": "echo hello!"
+    "scripts": {
+        "test": "echo hello!"
+    },
+    "hooks":{
+        "fileChange": ["test"]
+    }
 }

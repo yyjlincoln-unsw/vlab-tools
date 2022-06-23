@@ -30,6 +30,8 @@ func main() {
 		logging.Errorf("Error: Unable to execute %v: %v\n", CommandName, err)
 		os.Exit(1)
 	}
+	hooks := list.GetHooks(CommandName)
+	fmt.Print(hooks)
 	code, err := executor.ExecuteShell(command)
 	if err != nil {
 		logging.Errorf("%v", err)

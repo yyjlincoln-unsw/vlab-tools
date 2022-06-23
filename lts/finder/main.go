@@ -66,47 +66,75 @@ func FindLTS() (string, error) {
 // LTS Command List ADT
 
 type LTSCommandList struct {
-	commands map[string]string
+	Scripts map[string]string
+	Hooks   map[string][]string
 }
 
 func newLTSCommandList() LTSCommandList {
 	return LTSCommandList{
-		commands: map[string]string{},
+		Scripts: map[string]string{},
+		Hooks:   map[string][]string{},
 	}
 }
 
 func (list LTSCommandList) GetCommand(name string) (string, error) {
-	cmd, ok := list.commands[name]
+	cmd, ok := list.Scripts[name]
 	if ok {
 		return cmd, nil
 	}
 	return "", fmt.Errorf("command not found: %v", name)
 }
 
+func (list LTSCommandList) GetHooks(name string) []string {
+	hooks := []string{}
+	for hook, vals := range list.Hooks {
+		for _, val := range vals {
+			if val == name {
+				hooks = append(hooks, hook)
+			}
+		}
+	}
+	return hooks
+}
+
 func (list LTSCommandList) addCommand(name string, command string) {
-	list.commands[name] = command
+	list.Scripts[name] = command
+}
+
+func (list LTSCommandList) addHook(hookName string, commandNames []string) {
+	list.Hooks[hookName] = commandNames
 }
 
 func ReadCommandList() (*LTSCommandList, error) {
 	// Try and find LTS
 	file, err := FindLTS()
 	if err != nil {
-		return nil, fmt.Errorf("in RadCommandList: %v", err)
+		return nil, fmt.Errorf("in ReadCommandList: %v", err)
 	}
 	// Read the file
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("in RadCommandList: %v", err)
+		return nil, fmt.Errorf("in ReadCommandList: %v", err)
 	}
 	// Unmarshal the JSON
-	commands := map[string]string{}
-	if err := json.Unmarshal(content, &commands); err != nil {
-		return nil, fmt.Errorf("in RadCommandList: %v", err)
+	scripts := map[string]string{}
+	hooks := map[string][]string{}
+	commands := &LTSCommandList{
+		Scripts: scripts,
+		Hooks:   hooks,
 	}
+	if err := json.Unmarshal(content, &commands); err != nil {
+		return nil, fmt.Errorf("in ReadCommandList: %v", err)
+	}
+
 	// Load them into LTSCommandList
 	list := newLTSCommandList()
-	for k, v := range commands {
+	for k, v := range scripts {
 		list.addCommand(k, v)
+	}
+
+	for k, v := range hooks {
+		list.addHook(k, v)
 	}
 	return &list, nil
 }
