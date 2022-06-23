@@ -13,7 +13,7 @@ import (
 	"github.com/inancgumus/screen"
 )
 
-const VERSION = "1.0"
+const VERSION = "v1.1.0"
 
 func main() {
 	if len(os.Args) == 0 {
