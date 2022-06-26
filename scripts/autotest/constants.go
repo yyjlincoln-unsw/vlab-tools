@@ -172,7 +172,7 @@ var Class_CS2521 = &CourseInformation{
 							"cloud-autotest",
 							"cs2521_lab3",
 							GetCurrentUser(),
-							"./testBSTree",
+							"./runBSTree",
 						},
 					},
 				},
