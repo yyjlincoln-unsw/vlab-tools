@@ -148,6 +148,36 @@ var Class_CS2521 = &CourseInformation{
 	CourseName: "COMP2521 - Term 2, 2022",
 	Tasks: []*Task{
 		{
+			Identifier: "lab3-test",
+			Name:       "Lab 3 - Test your code",
+			CommandSet: &commands.CommandSet{
+				Commands: []commands.Command{
+					{
+						Command: "echo",
+						Args: []string{
+							"Making...",
+						},
+					},
+					{
+						Command: "make",
+						Args:    []string{},
+					},
+					{
+						Command: "clear",
+						Args:    []string{},
+					},
+					{
+						Command: "lt",
+						Args: []string{
+							"cloud-autotest",
+							"cs2521_lab3",
+							GetCurrentUser(),
+							"./testBSTree",
+						},
+					},
+				},
+			},
+		}, {
 			Identifier: "asm1-test",
 			Name:       "Assignment 1 - Test your code",
 			CommandSet: &commands.CommandSet{
